@@ -1,21 +1,24 @@
 const jwt = require("jsonwebtoken");
-const HandleError = require("../utils/handleError");
-const authMiddleware = (req, next) => {
-  const token = req.cookies.food_deli_token;
+
+const authMiddleware = (req, res, next) => {
+  const token = req.cookies?.food_deli_token;
+
   if (!token) {
-    return next(HandleError(401, "Access Denied. No token provided."));
-  }
-  try {
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        return next(HandleError(403, "Token is not valid"));
-      }
-      req.user = decoded;
-      next();
+    return res.status(401).json({
+      message: "Access denied. No token provided.",
     });
-  } catch (err) {
-    HandleError(err);
   }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({
+        message: "Token is not valid.",
+      });
+    }
+
+    req.user = decoded; 
+    next();
+  });
 };
 
 module.exports = authMiddleware;

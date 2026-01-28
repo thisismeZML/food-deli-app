@@ -1,16 +1,15 @@
-const HandleError = require("../utils/handleError");
-
 const rolemiddleware = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return HandleError(401, "Access Denied. Not authenticated.");
+      return res.status(401).json({
+        message: "Access denied. Not authenticated.",
+      });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      return HandleError(
-        403,
-        "Access Denied. You don't have permission to access this resource."
-      );
+      return res.status(403).json({
+        message: "Access denied. You don't have permission.",
+      });
     }
 
     next();
